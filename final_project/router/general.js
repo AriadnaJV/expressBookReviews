@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios');
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
@@ -69,5 +70,90 @@ public_users.get('/review/:isbn',function (req, res) {
         res.status(404).send({ error: "Book not found" });
     }
 });
+
+//getting list of books available using async-await with Axios.
+async function getBooks(callback) {
+  try {
+    const response = await axios.get('http://localhost:5000/');
+    callback(null, response.data);
+  } catch (error) {
+    callback(error);
+  }
+}
+
+//TEST
+/*
+if (require.main === module) {
+  getBooks((err, data) => {
+    if (err) {
+      console.error("Error:", err.message);
+    } else {
+      console.log("Books:\n", data);
+    }
+  });
+}
+*/
+
+//getting the book details based on ISBN using Promises
+const getBookByISBN = (isbn) => {
+    const req = axios.get(`http://localhost:5000/isbn/${isbn}`);
+    console.log(`Fetching book with ISBN ${isbn}...`); 
+  
+    req.then(resp => {
+      console.log("Fulfilled");
+      console.log(resp.data);
+    }).catch(err => {
+      console.log("Rejected");
+      console.log(err.message);
+    });
+};
+  
+//TEST
+/*
+if (require.main === module) {
+    getBookByISBN(8);
+}
+*/
+
+//getting books based on author using Promises
+const getBookByAuthor = (author) => {
+    const req = axios.get(`http://localhost:5000/author/${author}`);
+    console.log(`Fetching books by author ${author}...`);
+
+    req.then(resp => {
+        console.log("Fulfilled");
+        console.log(resp.data);
+    }).catch(err => {
+        console.log("Rejected");
+        console.log(err);
+    });
+};
+
+// TEST
+/*
+if (require.main === module) {
+    getBookByAuthor("Unknown");
+}
+*/
+
+const getBookByTitle = (title) => {
+    const req = axios.get(`http://localhost:5000/title/${title}`);
+    console.log(`Fetching book details by title ${title}...`);
+
+    req.then(resp => {
+        console.log("Fulfilled");
+        console.log(resp.data);
+    }).catch(err => {
+        console.log("Rejected");
+        console.log(err);
+    });
+};
+
+//TEST
+/*
+if (require.main === module) {
+    getBookByTitle("Things Fall Apart");
+}
+*/
 
 module.exports.general = public_users;
